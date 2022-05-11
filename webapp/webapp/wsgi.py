@@ -1,0 +1,21 @@
+"""
+WSGI config for webapp project.
+
+It exposes the WSGI callable as a module-level variable named ``application``.
+
+For more information on this file, see
+https://docs.djangoproject.com/en/4.0/howto/deployment/wsgi/
+"""
+
+import os
+
+from django.core.wsgi import get_wsgi_application
+# from opentelemetry.instrumentation.wsgi import OpenTelemetryMiddleware
+
+from opentelemetry.instrumentation.django import DjangoInstrumentor
+DjangoInstrumentor().instrument()
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'webapp.settings')
+
+application = get_wsgi_application()
+# application = OpenTelemetryMiddleware(application)

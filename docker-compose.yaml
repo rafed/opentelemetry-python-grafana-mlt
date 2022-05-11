@@ -1,0 +1,81 @@
+version: "3.3"
+   
+services:
+  ### DJANGO APPS ###
+  webapp:
+    build: ./webapp
+    command: python manage.py runserver 0.0.0.0:8000
+    environment:
+      - TRACING_HOST=jaeger
+      - TRACING_PORT=6831
+    volumes:
+      - ./webapp:/webapp
+    ports:
+      - "8000:8000"
+    depends_on:
+      - webapi
+
+  webapi:
+    build: ./webapi
+    command: python manage.py runserver 0.0.0.0:8001
+    environment:
+      - TRACING_HOST=jaeger
+      - TRACING_PORT=6831
+    volumes:
+      - ./webapi:/webapi
+    ports:
+      - "8001:8001"
+
+  ### OBSERVABILITY APPS ###
+
+  grafana:
+    image: grafana/grafana:8.5.2
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/dashboard.yaml:/etc/grafana/provisioning/datasources/dashboard.yaml
+    depends_on:
+      # - tempo
+      - loki
+      - prometheus
+
+  # tempo:
+  #   image: grafana/tempo:1.2.1
+  #   ports:
+  #     - "14268:14268"
+  #   command:
+  #     - -config.file=/etc/tempo/tempo.yaml
+  #   volumes:
+  #     - ./tempo/tempo.yaml:/etc/tempo/tempo.yaml
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.32
+    ports:
+      - 16686:16686
+      - 6831:6831
+
+  loki:
+    image: grafana/loki:2.5.0
+    ports:
+      - "3100:3100"
+    depends_on:
+      - promtail
+
+  promtail:
+    image: grafana/promtail:2.5.0
+    volumes:
+      - ./promtail/promtail.yaml:/etc/promtail/promtail.yaml
+      - ./webapp/webapp.log:/var/log/webapp.log
+      - ./webapi/webapi.log:/var/log/webapi.log
+    command: --config.file=/etc/promtail/promtail.yaml
+    depends_on:
+      - webapp
+      - webapi
+
+  prometheus:
+    image: prom/prometheus:v2.35.0
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus:/etc/prometheus
+    command: --config.file=/etc/prometheus/prometheus.yaml
