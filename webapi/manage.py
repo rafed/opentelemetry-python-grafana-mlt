@@ -3,17 +3,13 @@
 import os
 import sys
 
-from opentelemetry import trace, baggage
-from opentelemetry.context import attach, detach
+from opentelemetry import trace
 from opentelemetry.exporter.jaeger.thrift import JaegerExporter
 from opentelemetry.instrumentation.django import DjangoInstrumentor
 from opentelemetry.instrumentation.logging import LoggingInstrumentor
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.sdk.resources import SERVICE_NAME, Resource
-
-
-from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 
 def main():
     """Run administrative tasks."""
