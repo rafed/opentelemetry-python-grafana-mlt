@@ -13,8 +13,10 @@ def index(request):
 
 def service(request):
 
+    logger.error("Log1 on Webapp!")
+
     with tracer.start_as_current_span("API call") as span:
-        logger.error("Log on Webapp!")
+        logger.error("Log2 on Webapp!")
 
         time.sleep(0.3)
         r = requests.get("http://webapi:8001/add")

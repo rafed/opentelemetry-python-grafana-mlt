@@ -34,7 +34,9 @@ datasources:
       httpMethod: GET
       tracesToLogs:
         datasourceUid: my-loki
-        tags: ['job', 'instance', 'pod', 'namespace', 'app']
+        tags: []
+        mappedTags: [{ key: 'service.name', value: 'app' }]
+        mapTagNamesEnabled: true
 
   # - name: tempo
   #   type: tempo
