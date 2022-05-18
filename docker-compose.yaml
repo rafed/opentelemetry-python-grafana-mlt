@@ -38,6 +38,7 @@ services:
       # - tempo
       - loki
       - prometheus
+      - jaeger
 
   # tempo:
   #   image: grafana/tempo:1.2.1
